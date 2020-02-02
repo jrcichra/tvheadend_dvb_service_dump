@@ -3,6 +3,11 @@ Writes out m3u files, one for each tuner/channel/subchannel
 
 # Install & Run
 + Have a recent version of node installed, I recommend NodeSource's instructions: https://github.com/nodesource/distributions#installation-instructions
+  ```
+  # Using Ubuntu
+  curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+  ```
 + Globally install yarn `npm install -g yarn`
 + Clone this repository `git clone https://github.com/jrcichra/tvheadend_dvb_service_dump.git`
 + `cd tvheadend_dvb_service_dump`
