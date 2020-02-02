@@ -11,7 +11,7 @@ Writes out m3u files, one for each tuner/channel/subchannel
 + Globally install yarn `npm install -g yarn`
 + Clone this repository `git clone https://github.com/jrcichra/tvheadend_dvb_service_dump.git`
 + `cd tvheadend_dvb_service_dump`
-+ `yarn install` to pull all dependencies (such as puppeteer)
++ `yarn install` to pull all dependencies (such as puppeteer) - NOTE: this might take a while
 + run with `node main.js -u "<URL>" -o "<OUTPUT_DIR>"`
 
 
