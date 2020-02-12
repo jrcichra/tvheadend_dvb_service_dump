@@ -97,7 +97,7 @@ const delay = flags.delay;
   for (let row of table) {
     let f = false;
     let data = await download(row.url);
-    let filename = `${flags.o}/${row.input}_channel_${row.channel}-${row.subchannel}`;
+    let filename = `${flags.o}/${row.channel}-${row.subchannel}_${row.input}`;
     if (row.name.trim() != "") {
       filename += `_${row.name.trim().replace(' ', '_')}`;
     }
