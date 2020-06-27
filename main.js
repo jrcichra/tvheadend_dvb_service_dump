@@ -8,8 +8,9 @@ args
 const flags = args.parse(process.argv);
 const delay = flags.delay;
 
+
 (async () => {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   console.log(flags)
   await page.goto(flags.url, {
@@ -24,19 +25,11 @@ const delay = flags.delay;
   });
   //Give it some time
   await page.waitFor(delay);
-  //Handle clicking on DVB Inputs in javascript
+  //Handle clicking on Television in javascript
   await page.evaluate(() => {
-    let elements = document.getElementsByClassName('hardware');
+    let elements = document.getElementsByClassName('television');
     let dvb = elements[0].parentElement.parentElement.parentElement;
     dvb.click();
-  });
-  //Give it some time
-  await page.waitFor(delay);
-  //Handle clicking on services in javascript
-  await page.evaluate(() => {
-    let elements = document.getElementsByClassName('services');
-    let services = elements[0].parentElement.parentElement.parentElement;
-    services.click();
   });
   //Give it some time
   await page.waitFor(delay);
@@ -63,27 +56,23 @@ const delay = flags.delay;
   //Figure out all the table details
   let table = await page.evaluate(() => {
     let table = [];
-    for (const a of document.querySelectorAll("a")) {
-      if (a.textContent == "Play") {
-        //We found a cell in a table that's in a row, we can use this to walk to the proper location
-        let o = new Object();
-        let row = a.parentElement.parentElement.parentElement;
-        // console.log(row);
-        o.url = a.href;
-        o.name = row.cells[3].textContent;
-        o.service = row.cells[4].textContent;
-        o.input = row.cells[9].textContent.replace('_', '');
-        o.mux = row.cells[10].textContent;
-        o.channel = parseInt(row.cells[13].textContent);
-        o.subchannel = parseInt(row.cells[14].textContent);
-        table.push(o);
-      }
+    for (const play of document.getElementsByClassName("playlink")) {
+      let url = play.parentElement;
+      let row = play.parentElement.parentElement.parentElement.parentElement;
+      let o = new Object();
+      o.url = url.href;
+      o.name = row.cells[3].textContent.trim();
+      o.channel = row.cells[4].textContent.split('.')[0].trim();
+      o.subchannel = row.cells[4].textContent.split('.')[1].trim();
+      o.input = row.cells[12].textContent.split('/')[0].split(' ').join('_').trim();
+      o.mux = row.cells[12].textContent.split('/')[1].split(' ').join('_').trim();
+      table.push(o);
     }
     return table;
   });
 
   //At this point we've built a table with a url for each mux/input with some details
-  console.log(table.length);
+  console.log(table);
 
   //We don't need a dedicated browser anymore, we got the data we need, going to use an HTTP downloading library instead
   await browser.close();
@@ -97,10 +86,8 @@ const delay = flags.delay;
   for (let row of table) {
     let f = false;
     let data = await download(row.url);
-    let filename = `${flags.o}/${row.channel}-${row.subchannel}_${row.input}`;
-    if (row.name.trim() != "") {
-      filename += `_${row.name.trim().replace(' ', '_')}`;
-    }
+    let hostname = flags.url.split(':')[1].split('/').join('');
+    let filename = `${flags.o}/${row.channel}.${row.subchannel}_${row.name}_(${hostname})`;
     filename += '.m3u';
     // Check if the file already exits
     if (fs.existsSync(filename)) {
