@@ -3,7 +3,7 @@ const args = require("args");
 args
   .option("url", "url:port of tvheadend to scrape")
   .option("o", "output directory for m3u files")
-  .option("delay", "number of millisecond to delay between clicks", 1000);
+  .option("delay", "number of millisecond to delay between clicks", 2000);
 
 const flags = args.parse(process.argv);
 const delay = flags.delay;
@@ -16,6 +16,7 @@ const delay = flags.delay;
     waitUntil: "networkidle2",
   });
 
+  await page.waitForTimeout(delay);
   //Handle clicking on the wrench in javascript
   await page.evaluate(() => {
     let elements = document.getElementsByClassName("wrench");
@@ -64,16 +65,6 @@ const delay = flags.delay;
       o.name = row.cells[3].textContent.trim();
       o.channel = row.cells[4].textContent.split(".")[0].trim();
       o.subchannel = row.cells[4].textContent.split(".")[1].trim();
-      o.input = row.cells[12].textContent
-        .split("/")[0]
-        .split(" ")
-        .join("_")
-        .trim();
-      o.mux = row.cells[12].textContent
-        .split("/")[1]
-        .split(" ")
-        .join("_")
-        .trim();
       table.push(o);
     }
     return table;
@@ -93,8 +84,7 @@ const delay = flags.delay;
   for (let row of table) {
     let f = false;
     let data = await download(row.url);
-    let hostname = flags.url.split(":")[1].split("/").join("");
-    let filename = `${flags.o}/${row.channel}.${row.subchannel}_${row.name}_(${hostname})`;
+    let filename = `${flags.o}/${row.channel}.${row.subchannel}_${row.name}`;
     filename += ".m3u";
     // Check if the file already exits
     if (fs.existsSync(filename)) {
