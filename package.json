@@ -17,6 +17,6 @@
     "puppeteer": "^19.3.0"
   },
   "devDependencies": {
-    "npm-check-updates": "^16.4.3"
+    "npm-check-updates": "^16.5.0"
   }
 }
