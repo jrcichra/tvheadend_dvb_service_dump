@@ -14,7 +14,7 @@
     "args": "^5.0.3",
     "download": "^8.0.0",
     "glob": "^9.3.2",
-    "puppeteer": "^19.8.0"
+    "puppeteer": "^19.8.2"
   },
   "devDependencies": {
     "npm-check-updates": "^16.8.2"
