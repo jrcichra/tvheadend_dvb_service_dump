@@ -79,27 +79,18 @@ const delay = flags.delay;
   const fs = require("fs");
   const download = require("download");
 
-  let good_count = 0;
-  let skipped_count = 0;
+  let count = 0;
   for (let row of table) {
-    let f = false;
     let data = await download(row.url);
     let filename = `${flags.o}/${row.channel}.${row.subchannel}_${row.name}`;
     filename += ".m3u";
-    // Check if the file already exits
-    if (fs.existsSync(filename)) {
-      console.warn(`${filename} already exists, skipping...`);
-      skipped_count++;
-      f = true;
-    } else {
-      good_count++;
+    //Skip things with MHz in the name
+    if (filename.includes("MHz")) {
+      continue;
     }
     fs.writeFileSync(filename, data);
-    if (!f) {
-      console.log(`Wrote out: ${filename}`);
-    }
+    console.log(`Wrote out: ${filename}`);
+    count += 1;
   }
-  console.log(
-    `Script complete: Wrote ${good_count} files and skipped ${skipped_count} because the file already existed (likely some duplicate tvheadend entries on disk / in the webui)`
-  );
+  console.log(`Script complete: Wrote ${count} files`);
 })();
